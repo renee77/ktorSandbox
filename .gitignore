@@ -1,0 +1,12 @@
+# Gradle: cache en buildoutput
+.gradle/
+build/
+
+# IntelliJ IDEA: editor-instellingen en modulebestanden
+.kotlin/
+.idea/
+*.iml
+
+# Besturingssysteem-rommel (Lonneke werkt misschien op Mac/Windows)
+.DS_Store
+Thumbs.db
