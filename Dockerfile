@@ -1,4 +1,3 @@
-LABEL authors="eva"
 # syntax=docker/dockerfile:1
 
 # ===== Stage 1: build =====
@@ -21,3 +20,20 @@ RUN chmod +x ./gradlew
 # falende test de hele image-build breekt (fail fast).
 # --no-daemon: geen Gradle-achtergrondproces in een wegwerp-container.
 RUN ./gradlew test buildFatJar --no-daemon
+
+# ===== Stage 2: runtime (de etalage) =====
+# Alleen een JRE nodig — we draaien hier, we bouwen niet meer.
+# 'jre' i.p.v. 'jdk' maakt het image kleiner: geen compiler aan boord.
+FROM eclipse-temurin:21-jre AS runtime
+
+WORKDIR /app
+
+# Haal ENKEL de fat jar uit de build-stage op. Al het andere
+# (broncode, Gradle, testtroep) blijft in stage 1 achter.
+COPY --from=build /app/build/libs/ktor-sandbox-all.jar app.jar
+
+# Documenteert dat de app op poort 8080 luistert (Ktor's standaard).
+EXPOSE 8080
+
+# Start de applicatie wanneer de container draait.
+ENTRYPOINT ["java", "-jar", "app.jar"]
